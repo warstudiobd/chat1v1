@@ -1,0 +1,36 @@
+{
+  "name": "LotChat - Live Voice Rooms & Chat",
+  "short_name": "LotChat",
+  "description": "Connect with people around the world through live voice rooms, gifting, and messaging. By War Studio Ltd.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0F",
+  "theme_color": "#FF2D78",
+  "categories": ["social", "entertainment"],
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.lotchat.warstudio",
+      "url": "https://play.google.com/store/apps/details?id=com.lotchat.warstudio"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon-light-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
