@@ -6,9 +6,10 @@ import { useDiscoverUsers, followUser, getAvatarGradient, type Profile } from "@
 
 interface DiscoverScreenProps {
   onMessage?: (userId: string) => void
+  onViewProfile?: (userId: string) => void
 }
 
-function UserCard({ user, onMessage }: { user: Profile; onMessage?: (userId: string) => void }) {
+function UserCard({ user, onMessage, onViewProfile }: { user: Profile; onMessage?: (userId: string) => void; onViewProfile?: (userId: string) => void }) {
   const [following, setFollowing] = useState(false)
   const gradient = user.avatar_url ? "" : getAvatarGradient(user.display_name ?? "U")
   const displayName = user.display_name ?? "User"
@@ -24,7 +25,7 @@ function UserCard({ user, onMessage }: { user: Profile; onMessage?: (userId: str
   }
 
   return (
-    <div className="relative flex flex-col overflow-hidden rounded-2xl">
+    <div className="relative flex flex-col overflow-hidden rounded-2xl cursor-pointer" onClick={() => onViewProfile?.(user.id)}>
       <div className={`${gradient || "bg-gradient-to-br from-pink-500 to-purple-600"} aspect-[3/4] w-full flex items-end relative`}>
         {user.avatar_url && (
           <img src={user.avatar_url} alt={displayName} className="absolute inset-0 w-full h-full object-cover" />
@@ -98,7 +99,7 @@ function UserCard({ user, onMessage }: { user: Profile; onMessage?: (userId: str
   )
 }
 
-export function DiscoverScreen({ onMessage }: DiscoverScreenProps) {
+export function DiscoverScreen({ onMessage, onViewProfile }: DiscoverScreenProps) {
   const [activeFilter, setActiveFilter] = useState("popular")
   const [searchQuery, setSearchQuery] = useState("")
   const { data: users, isLoading } = useDiscoverUsers(activeFilter, searchQuery)
@@ -160,7 +161,7 @@ export function DiscoverScreen({ onMessage }: DiscoverScreenProps) {
         ) : (
           <div className="grid grid-cols-2 gap-2.5">
             {users.map((user) => (
-              <UserCard key={user.id} user={user} onMessage={onMessage} />
+              <UserCard key={user.id} user={user} onMessage={onMessage} onViewProfile={onViewProfile} />
             ))}
           </div>
         )}

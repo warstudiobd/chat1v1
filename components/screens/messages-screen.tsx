@@ -12,6 +12,7 @@ import {
 interface MessagesScreenProps {
   initialPartnerId?: string | null
   onClearPartner?: () => void
+  onViewProfile?: (userId: string) => void
 }
 
 function ChatRoom({ partnerId, onBack }: { partnerId: string; onBack: () => void }) {
@@ -116,7 +117,7 @@ function ChatRoom({ partnerId, onBack }: { partnerId: string; onBack: () => void
   )
 }
 
-export function MessagesScreen({ initialPartnerId, onClearPartner }: MessagesScreenProps) {
+export function MessagesScreen({ initialPartnerId, onClearPartner, onViewProfile }: MessagesScreenProps) {
   const [activePartnerId, setActivePartnerId] = useState<string | null>(initialPartnerId ?? null)
   const [searchQuery, setSearchQuery] = useState("")
   const { data: conversations, isLoading } = useConversations()
