@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
 
-const PUBLIC_PATHS = ['/privacy', '/terms', '/landing', '/manifest', '/auth', '/admin']
+const PUBLIC_PATHS = ['/privacy', '/terms', '/landing', '/manifest', '/auth', '/admin', '/api']
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
@@ -18,40 +17,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  let response = NextResponse.next({ request })
+  // Check for Supabase auth cookies (sb-*-auth-token)
+  const cookies = request.cookies.getAll()
+  const hasAuthCookie = cookies.some(c =>
+    c.name.includes('-auth-token') || c.name.includes('sb-') 
+  )
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll()
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-        response = NextResponse.next({ request })
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        )
-      },
-    },
-  })
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Not logged in and not on auth page -> redirect to login
-  if (!user && !path.startsWith('/auth')) {
+  if (!hasAuthCookie) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
 
-  // Logged in user on auth pages -> redirect to app
-  if (user && path.startsWith('/auth')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
-  }
-
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
