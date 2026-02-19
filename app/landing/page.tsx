@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Mic, Users, Gift, Shield, Crown, Gamepad2, ArrowRight } from "lucide-react"
+import Image from "next/image"
+import { Users, Gift, Shield, Crown, Gamepad2, ArrowRight } from "lucide-react"
 
 export default function LandingPage() {
   return (
@@ -9,9 +10,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 max-w-5xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #FF2D78, #8B5CF6)" }}>
-            <Mic className="w-5 h-5 text-white" />
-          </div>
+          <Image src="/images/logo.png" alt="LotChat" width={36} height={36} className="rounded-xl" />
           <span className="text-lg font-bold text-white">LotChat</span>
         </div>
         <div className="flex items-center gap-4">

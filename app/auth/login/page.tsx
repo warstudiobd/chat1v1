@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
+import Image from "next/image"
 import { Phone, ArrowRight, Shield, Loader2, Mail, Eye, EyeOff, CheckCircle2 } from "lucide-react"
 
 type AuthStep = "welcome" | "phone" | "otp" | "email"
@@ -142,14 +143,9 @@ export default function LoginPage() {
 
         {/* Logo & Branding */}
         <div className="text-center mb-8">
-          <div
-            className="w-20 h-20 mx-auto mb-4 rounded-3xl flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #FF2D78, #8B5CF6)" }}
-          >
-            <span className="text-3xl font-black text-white tracking-tighter">LC</span>
-          </div>
+          <Image src="/images/logo.png" alt="LotChat" width={96} height={96} className="mx-auto mb-3 rounded-3xl" priority />
           <h1 className="text-2xl font-black text-white tracking-tight">LotChat</h1>
-          <p className="text-sm text-[#8888AA] mt-1">Live Voice Rooms & Connect</p>
+          <p className="text-sm text-[#8888AA] mt-1">Voice Room & Chat</p>
         </div>
 
         {/* Welcome Step */}
