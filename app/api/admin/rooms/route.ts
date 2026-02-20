@@ -3,10 +3,9 @@ import { cookies } from "next/headers"
 import { createClient } from "@supabase/supabase-js"
 
 function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ""
+  return createClient(url, key)
 }
 
 async function isAdmin() {
@@ -21,7 +20,7 @@ export async function GET() {
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from("voice_rooms")
-    .select("*, host:profiles!voice_rooms_host_id_fkey(display_name)")
+    .select("*, owner:profiles!voice_rooms_owner_id_fkey(display_name)")
     .order("created_at", { ascending: false })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)

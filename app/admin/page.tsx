@@ -385,7 +385,7 @@ function RoomsSection() {
             <div key={room.id} className="flex items-center gap-3 px-3 py-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
               <div className="flex-1 min-w-0">
                 <span className="text-sm font-semibold text-white block">{room.name}</span>
-                <span className="text-[10px] text-[#8888AA]">Host: {room.host?.display_name ?? "Unknown"} | Category: {room.category} | Viewers: {room.viewer_count}</span>
+                <span className="text-[10px] text-[#8888AA]">Host: {room.owner?.display_name ?? "Unknown"} | Category: {room.category ?? "General"} | Viewers: {room.viewer_count ?? 0}</span>
               </div>
               <button onClick={() => handleDelete(room.id)} disabled={deleting === room.id}
                 className="w-7 h-7 rounded-lg flex items-center justify-center disabled:opacity-50" style={{ background: "rgba(239,68,68,0.15)" }}>
