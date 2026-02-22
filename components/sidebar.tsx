@@ -8,12 +8,8 @@ import {
   Plus,
   MessageCircle,
   User,
-  Bell,
   Mic,
   LogOut,
-  Diamond,
-  Gamepad2,
-  Users,
   Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,10 +23,6 @@ const navItems = [
   { href: "/discover", icon: Search, label: "Discover" },
   { href: "/create-room", icon: Plus, label: "Create Room" },
   { href: "/messages", icon: MessageCircle, label: "Messages" },
-  { href: "/notifications", icon: Bell, label: "Notifications" },
-  { href: "/friends", icon: Users, label: "Friends" },
-  { href: "/shop", icon: Diamond, label: "Shop" },
-  { href: "/games", icon: Gamepad2, label: "Games" },
   { href: "/profile", icon: User, label: "Profile" },
 ];
 

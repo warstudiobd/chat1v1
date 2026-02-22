@@ -53,22 +53,6 @@ export function ProfileView({
 
   return (
     <div className="flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-md">
-        <h1 className="text-lg font-bold text-foreground">
-          {isOwnProfile ? "My Profile" : profile.display_name || "Profile"}
-        </h1>
-        {isOwnProfile && (
-          <button
-            onClick={handleLogout}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-            aria-label="Settings"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
-        )}
-      </header>
-
       {/* Profile Card */}
       <div className="flex flex-col items-center gap-4 px-4 py-8">
         <UserAvatar
