@@ -26,19 +26,6 @@ export default function CreateRoomPage() {
     setCreating(true);
     setError(null);
 
-    // Verify session exists
-    const { data: sessionData } = await supabase.auth.getUser();
-    console.log("[v0] Auth user:", sessionData?.user?.id);
-    console.log("[v0] Profile id:", profile.id);
-    console.log("[v0] Insert payload:", {
-      name: name.trim(),
-      owner_id: profile.id,
-      category,
-      max_seats: maxSeats,
-      is_live: true,
-      viewer_count: 0,
-    });
-
     const { data, error: insertError } = await supabase
       .from("voice_rooms")
       .insert({
@@ -51,8 +38,6 @@ export default function CreateRoomPage() {
       })
       .select("id")
       .single();
-
-    console.log("[v0] Insert result:", { data, error: insertError });
 
     if (insertError) {
       setError(insertError.message);
