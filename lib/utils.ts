@@ -51,18 +51,8 @@ export function calculateLevel(xp: number): { level: number; progress: number } 
   return { level, progress: Math.min(progress, 100) };
 }
 
-export const GIFT_LIST = [
-  { id: "rose", name: "Rose", cost: 1, emoji: "rose" },
-  { id: "beer", name: "Beer", cost: 5, emoji: "beer" },
-  { id: "cake", name: "Cake", cost: 10, emoji: "cake" },
-  { id: "heart", name: "Heart", cost: 20, emoji: "heart" },
-  { id: "fireworks", name: "Fireworks", cost: 50, emoji: "fireworks" },
-  { id: "car", name: "Sports Car", cost: 100, emoji: "car" },
-  { id: "yacht", name: "Yacht", cost: 500, emoji: "yacht" },
-  { id: "castle", name: "Castle", cost: 1000, emoji: "castle" },
-  { id: "rocket", name: "Rocket", cost: 2000, emoji: "rocket" },
-  { id: "planet", name: "Planet", cost: 5000, emoji: "planet" },
-] as const;
+// Gift list is now in lib/gifts.ts (120+ items)
+export { GIFTS as GIFT_LIST } from "@/lib/gifts";
 
 export const ROOM_CATEGORIES = [
   "All",

@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { HomeHeader } from "@/components/home-header";
 import { OnlineFriends } from "@/components/online-friends";
 import { SystemBanner } from "@/components/system-banner";
+import { QuickActions } from "@/components/quick-actions";
 import { PopularRooms } from "@/components/popular-rooms";
+import { LeaderboardStrip } from "@/components/leaderboard-strip";
 import { VipBanner } from "@/components/vip-banner";
 import { EventsSection } from "@/components/events-section";
 import { GamesGrid } from "@/components/games-grid";
@@ -48,12 +50,14 @@ export default async function HomePage() {
   }));
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gradient-chamet min-h-screen">
       <HomeHeader />
       <main className="flex-1 overflow-y-auto pb-2">
         <OnlineFriends />
         <SystemBanner />
+        <QuickActions />
         <PopularRooms rooms={formattedRooms} />
+        <LeaderboardStrip />
         <VipBanner />
         <EventsSection />
         <GamesGrid />

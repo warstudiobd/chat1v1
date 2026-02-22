@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { Gift, Star, Heart } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Gift, Megaphone } from "lucide-react";
+import { GIFTS } from "@/lib/gifts";
 
 type ChatMessage = {
   id: string;
@@ -18,13 +18,12 @@ type ChatMessage = {
   } | null;
 };
 
-export function RoomChat({
-  messages,
-  announcement,
-}: {
+type RoomChatProps = {
   messages: ChatMessage[];
   announcement?: string;
-}) {
+};
+
+export function RoomChat({ messages, announcement }: RoomChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,82 +32,92 @@ export function RoomChat({
     }
   }, [messages]);
 
+  function getGiftEmoji(giftType: string | null): string {
+    if (!giftType) return "";
+    const gift = GIFTS.find((g) => g.id === giftType);
+    return gift?.emoji ?? "";
+  }
+
   return (
-    <div className="relative z-10 flex flex-1 flex-col gap-2 px-3">
-      {/* Room announcement banner */}
+    <div className="relative z-10 flex flex-1 flex-col gap-2 px-3 min-h-0">
+      {/* Room announcement */}
       {announcement && (
-        <div className="rounded-lg bg-card/70 px-3 py-2 backdrop-blur-sm">
-          <p className="text-xs text-foreground">
-            <span className="font-semibold">{"Room Announcement: "}</span>
-            {announcement}
-          </p>
+        <div className="flex items-start gap-2 rounded-xl glass-dark px-3 py-2.5">
+          <Megaphone className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-gold">Room Announcement</span>
+            <span className="text-xs text-foreground/80">{announcement}</span>
+          </div>
         </div>
       )}
 
       {/* Gift prompt */}
-      <button className="flex w-fit items-center gap-2 rounded-full bg-primary/20 px-4 py-1.5 backdrop-blur-sm">
-        <Gift className="h-4 w-4 text-primary" />
-        <span className="text-xs font-medium text-primary">
+      <button className="flex w-fit items-center gap-2 rounded-full gradient-primary px-4 py-2">
+        <Gift className="h-4 w-4 text-primary-foreground" />
+        <span className="text-xs font-semibold text-primary-foreground">
           {"Like? Send a gift!"}
         </span>
       </button>
 
-      {/* Chat messages */}
-      <div
-        ref={scrollRef}
-        className="flex flex-1 flex-col gap-1.5 overflow-y-auto scrollbar-hide"
-        style={{ maxHeight: "200px" }}
-      >
-        {messages.length === 0 ? (
-          <p className="py-4 text-center text-[10px] text-muted-foreground/60">
-            Welcome to the room!
-          </p>
-        ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className="flex items-start gap-1.5">
-              {msg.msgType === "gift" ? (
-                <div className="flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-1 backdrop-blur-sm">
-                  <Gift className="h-3 w-3 text-gold" />
-                  <span className="text-[11px]">
-                    <span className="font-semibold text-gold">
-                      {msg.sender?.display_name || "Someone"}
-                    </span>
-                    <span className="text-foreground/60">
-                      {" sent "}
-                      {msg.giftType}
-                    </span>
-                    {msg.diamondCost && (
-                      <span className="text-gold">
-                        {" ("}
-                        {msg.diamondCost}
-                        {")"}
-                      </span>
-                    )}
-                  </span>
-                </div>
-              ) : msg.msgType === "join" ? (
-                <div className="flex items-center gap-1 rounded-full bg-card/50 px-2.5 py-1 backdrop-blur-sm">
-                  <span className="text-[11px]">
-                    <span className="font-semibold text-cyan-400">
-                      {msg.sender?.display_name || "User"}
-                    </span>
-                    <span className="text-foreground/50">{" joined"}</span>
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-start gap-1 rounded-lg bg-card/40 px-2.5 py-1 backdrop-blur-sm">
-                  <span className="shrink-0 text-[11px] font-semibold text-primary">
-                    {msg.sender?.display_name || "User"}
-                    {":"}
-                  </span>
-                  <span className="text-[11px] text-foreground/80">
-                    {msg.content}
-                  </span>
-                </div>
-              )}
-            </div>
-          ))
+      {/* Chat feed */}
+      <div ref={scrollRef} className="flex flex-1 flex-col gap-1.5 overflow-y-auto scrollbar-hide">
+        {messages.length === 0 && (
+          <div className="py-8 text-center">
+            <span className="text-xs text-muted-foreground">{"Welcome to the room! Say hi"}</span>
+          </div>
         )}
+
+        {messages.map((msg) => {
+          const name = msg.sender?.display_name || "User";
+
+          if (msg.msgType === "join") {
+            return (
+              <div key={msg.id} className="animate-fade-in-up">
+                <span className="inline-flex items-center gap-1 rounded-lg glass-dark px-2.5 py-1">
+                  <span className="text-xs font-bold text-cyan">{name}</span>
+                  <span className="text-xs text-muted-foreground">joined</span>
+                </span>
+              </div>
+            );
+          }
+
+          if (msg.msgType === "gift") {
+            const emoji = getGiftEmoji(msg.giftType);
+            return (
+              <div key={msg.id} className="animate-fade-in-up">
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-gold/10 px-2.5 py-1.5">
+                  <span className="text-lg">{emoji}</span>
+                  <span className="text-xs font-bold text-gold">{name}</span>
+                  <span className="text-xs text-foreground/70">{msg.content}</span>
+                  {msg.diamondCost && (
+                    <span className="rounded-full bg-gold/20 px-1.5 py-0.5 text-[9px] font-bold text-gold">
+                      {msg.diamondCost.toLocaleString()}
+                    </span>
+                  )}
+                </span>
+              </div>
+            );
+          }
+
+          if (msg.msgType === "system") {
+            return (
+              <div key={msg.id} className="animate-fade-in-up">
+                <span className="inline-flex rounded-lg glass-dark px-2.5 py-1">
+                  <span className="text-[10px] text-muted-foreground">{msg.content}</span>
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <div key={msg.id} className="animate-fade-in-up">
+              <span className="inline-flex items-baseline gap-1.5 rounded-lg glass-dark px-2.5 py-1.5">
+                <span className="text-xs font-bold text-cyan">{name}</span>
+                <span className="text-xs text-foreground/90">{msg.content}</span>
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

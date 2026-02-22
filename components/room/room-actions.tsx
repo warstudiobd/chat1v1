@@ -7,22 +7,24 @@ import {
   Mic,
   Smile,
   Gift,
-  Mail,
   VolumeX,
   Volume2,
   LayoutGrid,
+  Settings2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GiftPanel } from "@/components/room/gift-panel";
 import { EmojiPicker } from "@/components/room/emoji-picker";
 import { RoomGames } from "@/components/room/room-games";
 import { SeatModeSwitcher } from "@/components/room/seat-mode-switcher";
+import type { Gift as GiftType } from "@/lib/gifts";
 
 type RoomToolbarProps = {
   roomId: string;
   seatMode: number;
   onSeatModeChange: (mode: number) => void;
   onSendMessage: (msg: string) => void;
+  onGiftSent?: (gift: GiftType, quantity: number) => void;
 };
 
 export function RoomActions({
@@ -30,6 +32,7 @@ export function RoomActions({
   seatMode,
   onSeatModeChange,
   onSendMessage,
+  onGiftSent,
 }: RoomToolbarProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [isSpeakerOff, setIsSpeakerOff] = useState(false);
@@ -48,8 +51,9 @@ export function RoomActions({
     }
   }
 
-  function handleEmojiSelect(emoji: string) {
-    onSendMessage(emoji);
+  function handleGiftSent(gift: GiftType, quantity: number) {
+    onGiftSent?.(gift, quantity);
+    setShowGifts(false);
   }
 
   return (
@@ -57,12 +61,9 @@ export function RoomActions({
       {/* Chat input overlay */}
       {showChat && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div
-            className="absolute inset-0 bg-background/30"
-            onClick={() => setShowChat(false)}
-          />
+          <div className="absolute inset-0 bg-background/30" onClick={() => setShowChat(false)} />
           <div className="relative w-full max-w-lg animate-slide-up px-3 pb-3">
-            <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4">
+            <div className="flex items-center gap-2 rounded-full border border-border/50 glass px-4">
               <input
                 type="text"
                 value={chatMsg}
@@ -84,11 +85,11 @@ export function RoomActions({
       )}
 
       {/* Main toolbar */}
-      <div className="relative z-10 flex items-center justify-around border-t border-border/30 bg-card/80 px-2 py-2.5 backdrop-blur-md">
+      <div className="relative z-10 flex items-center justify-around glass-dark border-t border-white/5 px-2 py-2.5">
         {/* Chat */}
         <button
           onClick={() => setShowChat(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-muted-foreground hover:text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
           aria-label="Chat"
         >
           <MessageCircle className="h-5 w-5" />
@@ -99,44 +100,38 @@ export function RoomActions({
           onClick={() => setIsMuted(!isMuted)}
           className={cn(
             "flex h-10 w-10 items-center justify-center rounded-full",
-            isMuted
-              ? "bg-muted/50 text-muted-foreground"
-              : "bg-green-500/20 text-green-400"
+            isMuted ? "bg-white/8 text-muted-foreground" : "bg-green-500/20 text-green-400"
           )}
           aria-label={isMuted ? "Unmute" : "Mute"}
         >
-          {isMuted ? (
-            <MicOff className="h-5 w-5" />
-          ) : (
-            <Mic className="h-5 w-5" />
-          )}
+          {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
         </button>
 
         {/* Emoji */}
         <button
           onClick={() => setShowEmoji(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-muted-foreground hover:text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
           aria-label="Emoji"
         >
           <Smile className="h-5 w-5" />
         </button>
 
-        {/* Gift - center elevated button */}
+        {/* Gift - elevated center button */}
         <button
           onClick={() => setShowGifts(true)}
-          className="flex h-14 w-14 -translate-y-2 items-center justify-center rounded-full gradient-primary shadow-lg shadow-primary/30"
-          aria-label="Send gift"
+          className="flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full gradient-primary shadow-lg shadow-primary/40"
+          aria-label="Gifts"
         >
           <Gift className="h-6 w-6 text-primary-foreground" />
         </button>
 
-        {/* Mail / Seat mode */}
+        {/* Seat mode */}
         <button
           onClick={() => setShowSeatMode(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-muted-foreground hover:text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
           aria-label="Seat mode"
         >
-          <Mail className="h-5 w-5" />
+          <Settings2 className="h-5 w-5" />
         </button>
 
         {/* Volume */}
@@ -144,23 +139,17 @@ export function RoomActions({
           onClick={() => setIsSpeakerOff(!isSpeakerOff)}
           className={cn(
             "flex h-10 w-10 items-center justify-center rounded-full",
-            isSpeakerOff
-              ? "bg-muted/50 text-muted-foreground"
-              : "bg-muted/50 text-foreground"
+            isSpeakerOff ? "bg-white/8 text-muted-foreground" : "bg-white/8 text-foreground"
           )}
           aria-label={isSpeakerOff ? "Unmute speaker" : "Mute speaker"}
         >
-          {isSpeakerOff ? (
-            <VolumeX className="h-5 w-5" />
-          ) : (
-            <Volume2 className="h-5 w-5" />
-          )}
+          {isSpeakerOff ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
         </button>
 
         {/* Games */}
         <button
           onClick={() => setShowGames(true)}
-          className="relative flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-muted-foreground hover:text-foreground"
+          className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
           aria-label="Games"
         >
           <LayoutGrid className="h-5 w-5" />
@@ -170,21 +159,17 @@ export function RoomActions({
 
       {/* Panels */}
       {showGifts && (
-        <GiftPanel roomId={roomId} onClose={() => setShowGifts(false)} />
+        <GiftPanel roomId={roomId} onClose={() => setShowGifts(false)} onGiftSent={handleGiftSent} />
       )}
       {showEmoji && (
         <EmojiPicker
-          onSelect={handleEmojiSelect}
+          onSelect={(emoji) => onSendMessage(emoji)}
           onClose={() => setShowEmoji(false)}
         />
       )}
       {showGames && <RoomGames onClose={() => setShowGames(false)} />}
       {showSeatMode && (
-        <SeatModeSwitcher
-          currentMode={seatMode}
-          onSelect={onSeatModeChange}
-          onClose={() => setShowSeatMode(false)}
-        />
+        <SeatModeSwitcher currentMode={seatMode} onSelect={onSeatModeChange} onClose={() => setShowSeatMode(false)} />
       )}
     </>
   );
