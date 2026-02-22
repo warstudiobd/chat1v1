@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
-import { RoomCard } from "@/components/room-card";
 import { HomeHeader } from "@/components/home-header";
-import { CategoryFilter } from "@/components/category-filter";
-import { QuickLinks } from "@/components/quick-links";
+import { OnlineFriends } from "@/components/online-friends";
+import { SystemBanner } from "@/components/system-banner";
+import { PopularRooms } from "@/components/popular-rooms";
+import { VipBanner } from "@/components/vip-banner";
+import { EventsSection } from "@/components/events-section";
+import { GamesGrid } from "@/components/games-grid";
+import { SpecialOffers } from "@/components/special-offers";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -25,49 +29,36 @@ export default async function HomePage() {
     `
     )
     .order("viewer_count", { ascending: false })
-    .limit(20);
+    .limit(8);
+
+  const formattedRooms = (rooms || []).map((room) => ({
+    id: room.id,
+    name: room.name,
+    category: room.category,
+    viewer_count: room.viewer_count,
+    is_live: room.is_live,
+    cover_url: room.cover_url,
+    owner: room.owner
+      ? {
+          display_name: (room.owner as any).display_name,
+          avatar_url: (room.owner as any).avatar_url,
+          level: (room.owner as any).level,
+        }
+      : null,
+  }));
 
   return (
     <div className="flex flex-col">
       <HomeHeader />
-      <QuickLinks />
-      <CategoryFilter />
-      <section className="px-4 py-4">
-        <h2 className="mb-4 text-lg font-bold text-foreground">
-          Live Rooms
-        </h2>
-        {rooms && rooms.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {rooms.map((room) => (
-              <RoomCard
-                key={room.id}
-                id={room.id}
-                name={room.name}
-                category={room.category}
-                viewerCount={room.viewer_count}
-                isLive={room.is_live}
-                coverUrl={room.cover_url}
-                owner={
-                  room.owner
-                    ? {
-                        display_name: (room.owner as any).display_name,
-                        avatar_url: (room.owner as any).avatar_url,
-                        level: (room.owner as any).level,
-                      }
-                    : null
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-muted-foreground">No rooms yet</p>
-            <p className="text-sm text-muted-foreground/60">
-              Create the first voice room to get started
-            </p>
-          </div>
-        )}
-      </section>
+      <main className="flex-1 overflow-y-auto pb-2">
+        <OnlineFriends />
+        <SystemBanner />
+        <PopularRooms rooms={formattedRooms} />
+        <VipBanner />
+        <EventsSection />
+        <GamesGrid />
+        <SpecialOffers />
+      </main>
     </div>
   );
 }
