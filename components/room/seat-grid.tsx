@@ -1,9 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Mic, MicOff, Plus, Crown } from "lucide-react";
+import { Lock, Mic, MicOff, Crown } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
-import { LevelBadge } from "@/components/level-badge";
 
 type Seat = {
   seatNumber: number;
@@ -28,63 +27,75 @@ export function SeatGrid({ seats, maxSeats, ownerId }: SeatGridProps) {
     return { index: i, seat };
   });
 
+  // Use 4 columns for 8 seats, 5 cols for 10/20, 3 cols for 5
+  const gridCols =
+    maxSeats === 5
+      ? "grid-cols-3"
+      : maxSeats <= 8
+        ? "grid-cols-4"
+        : "grid-cols-5";
+
   return (
-    <div className="rounded-2xl bg-card p-4">
-      <div className="grid grid-cols-4 gap-4">
+    <div className="relative z-10 px-2">
+      <div className={cn("grid gap-x-3 gap-y-5", gridCols)}>
         {seatSlots.map(({ index, seat }) => {
           const isOwner = seat?.user?.id === ownerId;
           const isOccupied = !!seat?.user;
 
           return (
-            <div
-              key={index}
-              className="flex flex-col items-center gap-2"
-            >
+            <div key={index} className="flex flex-col items-center gap-1.5">
+              {/* Avatar / Lock circle */}
               <div className="relative">
+                {/* Speaking ring animation */}
                 {isOccupied && !seat?.isMuted && (
-                  <div className="absolute -inset-1 rounded-full border-2 border-primary animate-pulse-ring" />
+                  <div className="absolute -inset-1 rounded-full border-2 border-green-400 animate-pulse-ring" />
                 )}
+
                 <div
                   className={cn(
-                    "flex h-14 w-14 items-center justify-center rounded-full",
-                    isOccupied ? "bg-muted" : "border-2 border-dashed border-border"
+                    "flex items-center justify-center rounded-full",
+                    maxSeats <= 8 ? "h-16 w-16" : "h-13 w-13",
+                    isOccupied
+                      ? "ring-2 ring-primary/30"
+                      : "bg-card/40 border border-border/50"
                   )}
                 >
                   {isOccupied ? (
                     <UserAvatar
                       src={seat!.user!.avatar_url}
                       name={seat!.user!.display_name}
-                      size="md"
+                      size={maxSeats <= 8 ? "lg" : "md"}
                     />
                   ) : (
-                    <Plus className="h-5 w-5 text-muted-foreground/50" />
+                    <Lock className="h-5 w-5 text-muted-foreground/40" />
                   )}
                 </div>
+
+                {/* Owner crown */}
                 {isOwner && (
-                  <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full gradient-gold">
+                  <div className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full gradient-gold">
                     <Crown className="h-3 w-3 text-background" />
                   </div>
                 )}
+
+                {/* Mic status */}
                 {isOccupied && (
-                  <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-card">
+                  <div className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-card border border-border">
                     {seat?.isMuted ? (
-                      <MicOff className="h-3 w-3 text-destructive" />
+                      <MicOff className="h-2.5 w-2.5 text-destructive" />
                     ) : (
-                      <Mic className="h-3 w-3 text-green-400" />
+                      <Mic className="h-2.5 w-2.5 text-green-400" />
                     )}
                   </div>
                 )}
               </div>
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="max-w-16 truncate text-[10px] text-muted-foreground">
-                  {isOccupied
-                    ? seat!.user!.display_name || "User"
-                    : `Seat ${index + 1}`}
-                </span>
-                {isOccupied && (
-                  <LevelBadge level={seat!.user!.level} />
-                )}
-              </div>
+
+              {/* Name / seat number */}
+              <span className="max-w-16 truncate text-[10px] text-foreground/70">
+                {isOccupied
+                  ? seat!.user!.display_name || "User"
+                  : String(index + 1)}
+              </span>
             </div>
           );
         })}

@@ -7,7 +7,7 @@ import { cn, ROOM_CATEGORIES, formatCategory } from "@/lib/utils";
 import { useUser } from "@/components/user-provider";
 import { createClient } from "@/lib/supabase/client";
 
-const seatOptions = [2, 4, 6, 8] as const;
+const seatOptions = [5, 8, 10, 20] as const;
 
 export default function CreateRoomPage() {
   const router = useRouter();

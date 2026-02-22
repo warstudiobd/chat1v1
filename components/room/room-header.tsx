@@ -1,14 +1,13 @@
 "use client";
 
-import { ArrowLeft, Eye, Share2, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatNumber, isVipActive, isSvipActive } from "@/lib/utils";
+import { Users, MoreHorizontal, Power, Diamond } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
 import { UserAvatar } from "@/components/user-avatar";
-import { LevelBadge } from "@/components/level-badge";
-import { VipBadge } from "@/components/vip-badge";
 
 type RoomHeaderProps = {
   name: string;
+  roomId: string;
   category: string | null;
   viewerCount: number;
   owner: {
@@ -16,70 +15,81 @@ type RoomHeaderProps = {
     display_name: string | null;
     avatar_url: string | null;
     level: number;
-    vip_expiry: string | null;
-    svip_expiry: string | null;
   } | null;
+  diamonds?: number;
 };
 
 export function RoomHeader({
   name,
+  roomId,
   category,
   viewerCount,
   owner,
+  diamonds = 0,
 }: RoomHeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => router.push("/home")}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-          aria-label="Back"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-bold text-foreground">{name}</h1>
-            {category && (
-              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-medium text-primary">
-                {category}
-              </span>
-            )}
-          </div>
-          {owner && (
-            <div className="flex items-center gap-1.5">
-              <UserAvatar
-                src={owner.avatar_url}
-                name={owner.display_name}
-                size="xs"
-              />
-              <span className="text-xs text-muted-foreground">
-                {owner.display_name}
-              </span>
-              <LevelBadge level={owner.level} />
-              <VipBadge isVip={isVipActive(owner.vip_expiry)} isSvip={isSvipActive(owner.svip_expiry)} />
-            </div>
-          )}
+    <header className="relative z-10 flex items-center justify-between px-3 py-2">
+      {/* Left: Owner avatar + room info */}
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div className="relative shrink-0">
+          <UserAvatar
+            src={owner?.avatar_url ?? null}
+            name={owner?.display_name ?? null}
+            size="sm"
+          />
+        </div>
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate text-sm font-bold text-foreground">
+            {name}
+          </span>
+          <span className="text-[10px] text-muted-foreground">
+            {"ID:"}
+            {roomId.slice(0, 8)}
+          </span>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Eye className="h-3.5 w-3.5" />
-          {formatNumber(viewerCount)}
-        </span>
-        <button
-          className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
-          aria-label="Share"
-        >
-          <Share2 className="h-4 w-4" />
+
+      {/* Right: Badges + actions */}
+      <div className="flex items-center gap-1.5">
+        {/* Diamond badge */}
+        <div className="flex items-center gap-1 rounded-full bg-card/60 px-2 py-1">
+          <Diamond className="h-3 w-3 text-cyan-400" />
+          <span className="text-[10px] font-semibold text-foreground">
+            {formatNumber(diamonds)}
+          </span>
+        </div>
+
+        {category && (
+          <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-bold text-gold">
+            {category.toUpperCase()}
+          </span>
+        )}
+
+        {/* Viewer count */}
+        <button className="flex items-center gap-1 rounded-full bg-card/60 px-2 py-1">
+          <Users className="h-3 w-3 text-muted-foreground" />
+          <span className="text-[10px] font-medium text-foreground">
+            {viewerCount}
+          </span>
         </button>
+
+        {/* More */}
         <button
-          className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-card/60 text-muted-foreground"
           aria-label="More options"
         >
           <MoreHorizontal className="h-4 w-4" />
+        </button>
+
+        {/* Power / Leave */}
+        <button
+          onClick={() => router.push("/home")}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-card/60 text-muted-foreground hover:text-destructive"
+          aria-label="Leave room"
+        >
+          <Power className="h-4 w-4" />
         </button>
       </div>
     </header>

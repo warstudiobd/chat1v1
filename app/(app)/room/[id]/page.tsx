@@ -63,6 +63,7 @@ export default async function VoiceRoomPage({
       room={{
         id: room.id,
         name: room.name,
+        description: room.description,
         category: room.category,
         viewer_count: room.viewer_count,
         max_seats: room.max_seats,
