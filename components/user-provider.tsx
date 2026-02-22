@@ -15,6 +15,8 @@ export type Profile = {
   level: number;
   role: string | null;
   is_online: boolean;
+  is_vip: boolean;
+  is_svip: boolean;
   vip_expiry: string | null;
   created_at: string;
 };
