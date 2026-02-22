@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -50,9 +51,13 @@ export function Sidebar() {
     <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen w-64 flex-col border-r border-white/5 bg-card/80 backdrop-blur-xl">
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary">
-          <Mic className="h-5 w-5 text-primary-foreground" />
-        </div>
+        <Image
+          src="/icon-192.jpg"
+          alt="LotChat"
+          width={36}
+          height={36}
+          className="h-9 w-9 rounded-xl"
+        />
         <span className="text-lg font-bold text-foreground">LotChat</span>
       </div>
 

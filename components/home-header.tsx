@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Bell, Coins, Search } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/components/user-provider";
@@ -11,14 +12,13 @@ export function HomeHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between px-4 glass-dark">
       <div className="flex items-center gap-2.5">
-        <div
-          className="flex h-8 w-8 items-center justify-center rounded-xl md:hidden"
-          style={{
-            background: "linear-gradient(135deg, hsl(330,80%,60%), hsl(270,80%,60%))",
-          }}
-        >
-          <span className="text-sm font-black text-primary-foreground">L</span>
-        </div>
+        <Image
+          src="/icon-192.jpg"
+          alt="LotChat"
+          width={32}
+          height={32}
+          className="h-8 w-8 rounded-xl md:hidden"
+        />
         <h1 className="text-lg font-bold text-foreground md:hidden">
           LotChat
         </h1>
