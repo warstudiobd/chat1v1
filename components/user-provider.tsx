@@ -13,8 +13,8 @@ export type Profile = {
   beans: number;
   xp: number;
   level: number;
-  is_vip: boolean;
-  is_svip: boolean;
+  role: string | null;
+  is_online: boolean;
   vip_expiry: string | null;
   created_at: string;
 };

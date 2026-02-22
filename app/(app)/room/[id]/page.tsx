@@ -1,9 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import { RoomHeader } from "@/components/room/room-header";
-import { SeatGrid } from "@/components/room/seat-grid";
-import { RoomChat } from "@/components/room/room-chat";
-import { RoomActions } from "@/components/room/room-actions";
+import { RoomView } from "@/components/room/room-view";
 
 export default async function VoiceRoomPage({
   params,
@@ -19,7 +16,7 @@ export default async function VoiceRoomPage({
       `
       *,
       owner:profiles!voice_rooms_owner_id_fkey (
-        id, display_name, avatar_url, level, is_vip, is_svip
+        id, display_name, avatar_url, level
       )
     `
     )
@@ -57,41 +54,34 @@ export default async function VoiceRoomPage({
       )
     `
     )
-    .eq("room_id", id)
+    .eq("receiver_id", id)
     .order("created_at", { ascending: true })
     .limit(50);
 
   return (
-    <div className="flex h-screen flex-col md:h-auto md:min-h-screen">
-      <RoomHeader
-        name={room.name}
-        category={room.category}
-        viewerCount={room.viewer_count}
-        owner={room.owner as any}
-      />
-      <div className="flex flex-1 flex-col gap-4 p-4">
-        <SeatGrid
-          seats={(seats || []).map((s) => ({
-            seatNumber: s.seat_number,
-            isMuted: s.is_muted,
-            user: s.user as any,
-          }))}
-          maxSeats={room.max_seats}
-          ownerId={(room.owner as any)?.id}
-        />
-        <RoomChat
-          messages={(messages || []).map((m) => ({
-            id: m.id,
-            content: m.content,
-            msgType: m.msg_type,
-            giftType: m.gift_type,
-            diamondCost: m.diamond_cost,
-            createdAt: m.created_at,
-            sender: m.sender as any,
-          }))}
-        />
-      </div>
-      <RoomActions roomId={id} />
-    </div>
+    <RoomView
+      room={{
+        id: room.id,
+        name: room.name,
+        category: room.category,
+        viewer_count: room.viewer_count,
+        max_seats: room.max_seats,
+        owner: room.owner as any,
+      }}
+      initialSeats={(seats || []).map((s: any) => ({
+        seatNumber: s.seat_number,
+        isMuted: s.is_muted,
+        user: s.user,
+      }))}
+      initialMessages={(messages || []).map((m: any) => ({
+        id: m.id,
+        content: m.content,
+        msgType: m.msg_type,
+        giftType: m.gift_type,
+        diamondCost: m.diamond_cost,
+        createdAt: m.created_at,
+        sender: m.sender,
+      }))}
+    />
   );
 }

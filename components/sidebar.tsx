@@ -11,6 +11,10 @@ import {
   Bell,
   Mic,
   LogOut,
+  Diamond,
+  Gamepad2,
+  Users,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/components/user-provider";
@@ -24,7 +28,14 @@ const navItems = [
   { href: "/create-room", icon: Plus, label: "Create Room" },
   { href: "/messages", icon: MessageCircle, label: "Messages" },
   { href: "/notifications", icon: Bell, label: "Notifications" },
+  { href: "/friends", icon: Users, label: "Friends" },
+  { href: "/shop", icon: Diamond, label: "Shop" },
+  { href: "/games", icon: Gamepad2, label: "Games" },
   { href: "/profile", icon: User, label: "Profile" },
+];
+
+const adminItems = [
+  { href: "/admin", icon: Shield, label: "Admin" },
 ];
 
 export function Sidebar() {
@@ -68,6 +79,29 @@ export function Sidebar() {
             </Link>
           );
         })}
+        {profile?.role === "admin" && (
+          <>
+            <div className="my-2 border-t border-border" />
+            {adminItems.map((item) => {
+              const isActive = pathname?.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </>
+        )}
       </nav>
 
       <div className="border-t border-border p-4">

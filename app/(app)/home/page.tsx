@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { RoomCard } from "@/components/room-card";
 import { HomeHeader } from "@/components/home-header";
 import { CategoryFilter } from "@/components/category-filter";
+import { QuickLinks } from "@/components/quick-links";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -29,6 +30,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       <HomeHeader />
+      <QuickLinks />
       <CategoryFilter />
       <section className="px-4 py-4">
         <h2 className="mb-4 text-lg font-bold text-foreground">
