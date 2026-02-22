@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mic, Loader2 } from "lucide-react";
+import { OAuthButtons } from "@/components/oauth-buttons";
 
 export default function SignUpPage() {
   const [displayName, setDisplayName] = useState("");
@@ -109,6 +110,14 @@ export default function SignUpPage() {
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Create Account"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">or</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <OAuthButtons />
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
