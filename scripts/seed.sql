@@ -14,14 +14,14 @@ BEGIN
     -- Insert demo voice rooms
     INSERT INTO public.voice_rooms (name, owner_id, category, max_seats, viewer_count, is_live)
     VALUES
-      ('Chill Vibes Only', first_user_id, 'Chill', 8, 42, true),
-      ('Late Night Music', first_user_id, 'Music', 8, 128, true),
-      ('Gaming Squad', first_user_id, 'Gaming', 6, 23, true),
-      ('Study Together', first_user_id, 'Study', 4, 15, true),
-      ('Party Room', first_user_id, 'Party', 8, 67, true),
-      ('Open Chat', first_user_id, 'Chat', 8, 89, true),
-      ('Dating Lounge', first_user_id, 'Dating', 4, 31, false),
-      ('Music Producers', first_user_id, 'Music', 6, 52, true)
+      ('Chill Vibes Only', first_user_id, 'chat', 8, 42, true),
+      ('Late Night Music', first_user_id, 'music', 8, 128, true),
+      ('Gaming Squad', first_user_id, 'gaming', 6, 23, true),
+      ('Hangout Zone', first_user_id, 'chat', 4, 15, true),
+      ('Party Room', first_user_id, 'party', 8, 67, true),
+      ('Open Chat', first_user_id, 'chat', 8, 89, true),
+      ('Dating Lounge', first_user_id, 'dating', 4, 31, false),
+      ('Music Producers', first_user_id, 'music', 6, 52, true)
     ON CONFLICT DO NOTHING;
   END IF;
 END $$;

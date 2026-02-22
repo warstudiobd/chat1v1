@@ -66,11 +66,13 @@ export const GIFT_LIST = [
 
 export const ROOM_CATEGORIES = [
   "All",
-  "Music",
-  "Chat",
-  "Gaming",
-  "Chill",
-  "Party",
-  "Study",
-  "Dating",
+  "chat",
+  "music",
+  "gaming",
+  "dating",
+  "party",
 ] as const;
+
+export function formatCategory(cat: string): string {
+  return cat.charAt(0).toUpperCase() + cat.slice(1);
+}

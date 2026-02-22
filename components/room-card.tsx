@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Eye, Mic } from "lucide-react";
-import { cn, formatNumber } from "@/lib/utils";
+import { cn, formatNumber, formatCategory } from "@/lib/utils";
 import { UserAvatar } from "@/components/user-avatar";
 
 type RoomCardProps = {
@@ -18,13 +18,11 @@ type RoomCardProps = {
 };
 
 const categoryColors: Record<string, string> = {
-  Music: "bg-pink/20 text-pink",
-  Chat: "bg-primary/20 text-primary",
-  Gaming: "bg-green-500/20 text-green-400",
-  Chill: "bg-blue-500/20 text-blue-400",
-  Party: "bg-orange-500/20 text-orange-400",
-  Study: "bg-yellow-500/20 text-yellow-400",
-  Dating: "bg-red-500/20 text-red-400",
+  music: "bg-pink/20 text-pink",
+  chat: "bg-primary/20 text-primary",
+  gaming: "bg-green-500/20 text-green-400",
+  party: "bg-orange-500/20 text-orange-400",
+  dating: "bg-red-500/20 text-red-400",
 };
 
 export function RoomCard({
@@ -88,7 +86,7 @@ export function RoomCard({
                 categoryColors[category] || "bg-muted text-muted-foreground"
               )}
             >
-              {category}
+              {formatCategory(category)}
             </span>
           )}
         </div>

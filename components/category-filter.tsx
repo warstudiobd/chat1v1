@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { cn, ROOM_CATEGORIES } from "@/lib/utils";
+import { cn, ROOM_CATEGORIES, formatCategory } from "@/lib/utils";
 
 export function CategoryFilter() {
   const [active, setActive] = useState("All");
@@ -19,7 +19,7 @@ export function CategoryFilter() {
               : "bg-muted text-muted-foreground hover:text-foreground"
           )}
         >
-          {cat}
+          {cat === "All" ? "All" : formatCategory(cat)}
         </button>
       ))}
     </div>

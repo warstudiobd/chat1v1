@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Mic, Loader2 } from "lucide-react";
-import { cn, ROOM_CATEGORIES } from "@/lib/utils";
+import { cn, ROOM_CATEGORIES, formatCategory } from "@/lib/utils";
 import { useUser } from "@/components/user-provider";
 import { createClient } from "@/lib/supabase/client";
 
@@ -15,7 +15,7 @@ export default function CreateRoomPage() {
   const supabase = createClient();
 
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("Chat");
+  const [category, setCategory] = useState("chat");
   const [maxSeats, setMaxSeats] = useState<number>(8);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +110,7 @@ export default function CreateRoomPage() {
                     : "bg-muted text-muted-foreground hover:text-foreground"
                 )}
               >
-                {cat}
+                {formatCategory(cat)}
               </button>
             ))}
           </div>
