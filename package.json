@@ -1,7 +1,9 @@
 {
   "name": "lotchat",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "LotChat: Voice & Video Room - by WarStudio Ltd",
+  "author": "WarStudio Ltd <contact@warstudio.com>",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

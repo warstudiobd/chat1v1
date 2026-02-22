@@ -17,13 +17,13 @@ const SYMBOLS = [
   { id: "ace", emoji: "\u{1F0CF}", name: "Ace", value: 20 },
 ];
 
-const BET_AMOUNTS = [10, 25, 50, 100, 250, 500];
+const BET_AMOUNTS = [100, 200, 500, 1000, 2500, 5000];
 
 type ReelResult = (typeof SYMBOLS)[number];
 
 export function SlotMachine({ onClose }: { onClose: () => void }) {
-  const { profile } = useUser();
-  const [bet, setBet] = useState(10);
+  const { profile, updateDiamonds } = useUser();
+  const [bet, setBet] = useState(100);
   const [spinning, setSpinning] = useState(false);
   const [reels, setReels] = useState<ReelResult[][]>([
     [SYMBOLS[0], SYMBOLS[1], SYMBOLS[2]],
@@ -53,9 +53,11 @@ export function SlotMachine({ onClose }: { onClose: () => void }) {
     setWinLine(null);
 
     const supabase = createClient();
+    const afterBet = profile.diamonds - bet;
+    updateDiamonds(afterBet);
     await supabase
       .from("profiles")
-      .update({ diamonds: profile.diamonds - bet })
+      .update({ diamonds: afterBet })
       .eq("id", profile.id);
 
     /* Generate new reels with delays for animation */
@@ -96,9 +98,11 @@ export function SlotMachine({ onClose }: { onClose: () => void }) {
       win = bet * multiplier;
       setWinLine(1);
 
+      const afterWin = afterBet + win;
+      updateDiamonds(afterWin);
       await supabase
         .from("profiles")
-        .update({ diamonds: profile.diamonds - bet + win })
+        .update({ diamonds: afterWin })
         .eq("id", profile.id);
     }
 
@@ -117,9 +121,11 @@ export function SlotMachine({ onClose }: { onClose: () => void }) {
           const mult = rowMatches === 5 ? 25 : rowMatches === 4 ? 10 : 3;
           win = bet * mult;
           setWinLine(rowIdx);
+          const afterWin2 = afterBet + win;
+          updateDiamonds(afterWin2);
           await supabase
             .from("profiles")
-            .update({ diamonds: profile.diamonds - bet + win })
+            .update({ diamonds: afterWin2 })
             .eq("id", profile.id);
           break;
         }

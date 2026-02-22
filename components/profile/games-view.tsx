@@ -63,12 +63,12 @@ type MiniGame = {
 };
 
 const MINI_GAMES: MiniGame[] = [
-  { id: "lucky_box", name: "Lucky Box", cost: 10, maxWin: 100, icon: "\u{1F381}", gradient: "from-amber-500 to-orange-600", players: "12.1K" },
-  { id: "dice_duel", name: "Dice Duel", cost: 20, maxWin: 200, icon: "\u{1F3B2}", gradient: "from-red-500 to-pink-600", players: "9.8K" },
-  { id: "coin_flip", name: "Coin Flip", cost: 15, maxWin: 30, icon: "\u{1FA99}", gradient: "from-yellow-400 to-amber-500", players: "21.3K" },
-  { id: "lucky_spin", name: "Lucky Spin", cost: 50, maxWin: 500, icon: "\u{1F3A1}", gradient: "from-purple-500 to-indigo-600", players: "15.6K" },
-  { id: "treasure", name: "Treasure Hunt", cost: 30, maxWin: 300, icon: "\u{1F48E}", gradient: "from-emerald-500 to-teal-600", players: "7.4K" },
-  { id: "rocket", name: "Rocket Crash", cost: 25, maxWin: 250, icon: "\u{1F680}", gradient: "from-blue-500 to-cyan-600", players: "11.2K" },
+  { id: "lucky_box", name: "Lucky Box", cost: 100, maxWin: 1000, icon: "\u{1F381}", gradient: "from-amber-500 to-orange-600", players: "12.1K" },
+  { id: "dice_duel", name: "Dice Duel", cost: 200, maxWin: 2000, icon: "\u{1F3B2}", gradient: "from-red-500 to-pink-600", players: "9.8K" },
+  { id: "coin_flip", name: "Coin Flip", cost: 100, maxWin: 200, icon: "\u{1FA99}", gradient: "from-yellow-400 to-amber-500", players: "21.3K" },
+  { id: "lucky_spin", name: "Lucky Spin", cost: 500, maxWin: 5000, icon: "\u{1F3A1}", gradient: "from-purple-500 to-indigo-600", players: "15.6K" },
+  { id: "treasure", name: "Treasure Hunt", cost: 300, maxWin: 3000, icon: "\u{1F48E}", gradient: "from-emerald-500 to-teal-600", players: "7.4K" },
+  { id: "rocket", name: "Rocket Crash", cost: 200, maxWin: 2500, icon: "\u{1F680}", gradient: "from-blue-500 to-cyan-600", players: "11.2K" },
   { id: "patti", name: "Teen Patti", cost: 500, maxWin: 5000, icon: "\u{1F0CF}", gradient: "from-green-500 to-emerald-600", players: "8.9K" },
   { id: "ludo", name: "Ludo King", cost: 200, maxWin: 2000, icon: "\u{1F3B2}", gradient: "from-blue-500 to-indigo-600", players: "6.7K" },
   { id: "arena", name: "Battle Arena", cost: 300, maxWin: 3000, icon: "\u{2694}\u{FE0F}", gradient: "from-red-600 to-rose-700", players: "5.4K" },
@@ -77,7 +77,7 @@ const MINI_GAMES: MiniGame[] = [
 type MiniResult = { won: boolean; amount: number; gameName: string };
 
 export function GamesView() {
-  const { profile } = useUser();
+  const { profile, updateDiamonds } = useUser();
   const [openGame, setOpenGame] = useState<string | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
   const [miniResult, setMiniResult] = useState<MiniResult | null>(null);
@@ -88,14 +88,18 @@ export function GamesView() {
     setMiniResult(null);
 
     const supabase = createClient();
-    await supabase.from("profiles").update({ diamonds: profile.diamonds - game.cost }).eq("id", profile.id);
+    const afterBet = profile.diamonds - game.cost;
+    updateDiamonds(afterBet);
+    await supabase.from("profiles").update({ diamonds: afterBet }).eq("id", profile.id);
     await new Promise((r) => setTimeout(r, 1500));
 
     const won = Math.random() < 0.4;
-    const amount = won ? Math.floor(Math.random() * game.maxWin) + 1 : 0;
+    const amount = won ? Math.floor(Math.random() * game.maxWin) + game.cost : 0;
 
     if (won && amount > 0) {
-      await supabase.from("profiles").update({ diamonds: profile.diamonds - game.cost + amount }).eq("id", profile.id);
+      const afterWin = afterBet + amount;
+      updateDiamonds(afterWin);
+      await supabase.from("profiles").update({ diamonds: afterWin }).eq("id", profile.id);
     }
 
     setMiniResult({ won, amount, gameName: game.name });

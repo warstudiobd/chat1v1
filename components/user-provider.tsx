@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 
 export type Profile = {
   id: string;
@@ -27,19 +33,41 @@ export type Profile = {
 
 type UserContextType = {
   profile: Profile | null;
+  /** Instantly update the client-side diamond count (also persists via games) */
+  updateDiamonds: (newAmount: number) => void;
+  /** Replace the entire profile object (e.g. after editing) */
+  updateProfile: (partial: Partial<Profile>) => void;
 };
 
-const UserContext = createContext<UserContextType>({ profile: null });
+const UserContext = createContext<UserContextType>({
+  profile: null,
+  updateDiamonds: () => {},
+  updateProfile: () => {},
+});
 
 export function UserProvider({
-  profile,
+  profile: initialProfile,
   children,
 }: {
   profile: Profile | null;
   children: ReactNode;
 }) {
+  const [profile, setProfile] = useState<Profile | null>(initialProfile);
+
+  const updateDiamonds = useCallback((newAmount: number) => {
+    setProfile((prev) =>
+      prev ? { ...prev, diamonds: Math.max(0, newAmount) } : prev
+    );
+  }, []);
+
+  const updateProfile = useCallback((partial: Partial<Profile>) => {
+    setProfile((prev) => (prev ? { ...prev, ...partial } : prev));
+  }, []);
+
   return (
-    <UserContext.Provider value={{ profile }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ profile, updateDiamonds, updateProfile }}>
+      {children}
+    </UserContext.Provider>
   );
 }
 

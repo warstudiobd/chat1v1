@@ -18,7 +18,7 @@ const ITEMS = [
 ];
 
 const GRID_SIZE = 7;
-const ENTRY_FEE = 50;
+const ENTRY_FEE = 100;
 const MOVES_LIMIT = 25;
 
 type Cell = {
@@ -112,7 +112,7 @@ function removeAndDrop(grid: Cell[][], matches: [number, number][]): Cell[][] {
 }
 
 export function MatchThree({ onClose }: { onClose: () => void }) {
-  const { profile } = useUser();
+  const { profile, updateDiamonds } = useUser();
   const [grid, setGrid] = useState<Cell[][]>(createGrid);
   const [selected, setSelected] = useState<[number, number] | null>(null);
   const [score, setScore] = useState(0);
@@ -124,9 +124,11 @@ export function MatchThree({ onClose }: { onClose: () => void }) {
   const startGame = async () => {
     if (!profile || profile.diamonds < ENTRY_FEE) return;
     const supabase = createClient();
+    const afterBet = profile.diamonds - ENTRY_FEE;
+    updateDiamonds(afterBet);
     await supabase
       .from("profiles")
-      .update({ diamonds: profile.diamonds - ENTRY_FEE })
+      .update({ diamonds: afterBet })
       .eq("id", profile.id);
 
     setGrid(createGrid());
@@ -209,10 +211,12 @@ export function MatchThree({ onClose }: { onClose: () => void }) {
   const cashOut = async () => {
     if (!profile || score === 0) return;
     const winAmount = Math.floor(score / 10);
+    const newBalance = (profile.diamonds || 0) + winAmount;
+    updateDiamonds(newBalance);
     const supabase = createClient();
     await supabase
       .from("profiles")
-      .update({ diamonds: (profile.diamonds || 0) + winAmount })
+      .update({ diamonds: newBalance })
       .eq("id", profile.id);
     setGameActive(false);
   };

@@ -1,0 +1,37 @@
+{
+  "name": "LotChat: Voice & Video Room",
+  "short_name": "LotChat",
+  "description": "Join voice rooms, meet new people, send gifts, play games and build your community on LotChat by WarStudio Ltd.",
+  "start_url": "/home",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0b14",
+  "theme_color": "#7c3aed",
+  "categories": ["social", "entertainment"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "id": "com.lotchat.warstudio",
+  "icons": [
+    {
+      "src": "/icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.lotchat.warstudio"
+    }
+  ],
+  "prefer_related_applications": false
+}

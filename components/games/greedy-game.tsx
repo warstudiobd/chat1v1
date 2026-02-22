@@ -18,7 +18,7 @@ const FOOD_ITEMS = [
   { id: "cabbage", emoji: "\u{1F96C}", name: "Cabbage", multiplier: 5, color: "border-blue-400" },
 ];
 
-const WAGER_OPTIONS = [10, 50, 100, 1000];
+const WAGER_OPTIONS = [100, 500, 1000, 5000];
 
 const RECIPE_SETS = [
   { id: "salad", name: "Salad", emoji: "\u{1F957}" },
@@ -34,8 +34,8 @@ type ResultEntry = {
 };
 
 export function GreedyGame({ onClose }: { onClose: () => void }) {
-  const { profile } = useUser();
-  const [wager, setWager] = useState(10);
+  const { profile, updateDiamonds } = useUser();
+  const [wager, setWager] = useState(100);
   const [timer, setTimer] = useState(20);
   const [selectedFood, setSelectedFood] = useState<string | null>(null);
   const [spinning, setSpinning] = useState(false);
@@ -69,9 +69,11 @@ export function GreedyGame({ onClose }: { onClose: () => void }) {
     const supabase = createClient();
 
     /* deduct wager */
+    const afterBet = profile.diamonds - wager;
+    updateDiamonds(afterBet);
     await supabase
       .from("profiles")
-      .update({ diamonds: profile.diamonds - wager })
+      .update({ diamonds: afterBet })
       .eq("id", profile.id);
 
     /* spin animation */
@@ -113,9 +115,11 @@ export function GreedyGame({ onClose }: { onClose: () => void }) {
     const amount = won ? wager * winningFood.multiplier : 0;
 
     if (won && amount > 0) {
+      const afterWin = afterBet + amount;
+      updateDiamonds(afterWin);
       await supabase
         .from("profiles")
-        .update({ diamonds: profile.diamonds - wager + amount })
+        .update({ diamonds: afterWin })
         .eq("id", profile.id);
     }
 
