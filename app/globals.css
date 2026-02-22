@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 15% 8%;
+    --foreground: 0 0% 95%;
+    --card: 240 12% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 12% 14%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 270 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 18%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 240 10% 16%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 270 60% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 20%;
+    --input: 240 10% 20%;
+    --ring: 270 80% 60%;
+    --radius: 0.75rem;
+    --gold: 45 100% 55%;
+    --pink: 330 80% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(270, 80%, 60%), hsl(330, 80%, 60%));
+  }
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(45, 100%, 55%), hsl(35, 100%, 45%));
+  }
+  .text-gold {
+    color: hsl(45, 100%, 55%);
+  }
+}
