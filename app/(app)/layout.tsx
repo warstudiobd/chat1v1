@@ -18,11 +18,33 @@ export default async function AppLayout({
     redirect("/auth/login");
   }
 
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
+
+  // Fallback: if no profile exists (e.g. OAuth user before trigger existed),
+  // create one on-the-fly from the auth metadata.
+  if (!profile) {
+    const meta = user.user_metadata ?? {};
+    const displayName =
+      meta.display_name ?? meta.full_name ?? meta.name ?? user.email?.split("@")[0] ?? "User";
+    const avatarUrl = meta.avatar_url ?? meta.picture ?? null;
+
+    const { data: newProfile } = await supabase
+      .from("profiles")
+      .upsert({
+        id: user.id,
+        display_name: displayName,
+        avatar_url: avatarUrl,
+        username: displayName.toLowerCase().replace(/\s+/g, "_"),
+      })
+      .select("*")
+      .single();
+
+    profile = newProfile;
+  }
 
   return (
     <UserProvider profile={profile}>

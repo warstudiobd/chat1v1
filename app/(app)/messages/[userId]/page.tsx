@@ -17,7 +17,7 @@ export default async function ChatPage({
 
   const { data: otherUser } = await supabase
     .from("profiles")
-    .select("id, display_name, avatar_url, level, is_vip, is_svip")
+    .select("id, display_name, avatar_url, level, vip_expiry, svip_expiry")
     .eq("id", userId)
     .single();
 

@@ -17,7 +17,7 @@ import {
 import { UserAvatar } from "@/components/user-avatar";
 import { LevelBadge } from "@/components/level-badge";
 import { VipBadge } from "@/components/vip-badge";
-import { formatNumber, calculateLevel } from "@/lib/utils";
+import { formatNumber, calculateLevel, isVipActive, isSvipActive } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/components/user-provider";
 
@@ -82,7 +82,7 @@ export function ProfileView({
               {profile.display_name || "User"}
             </h2>
             <LevelBadge level={profile.level} />
-            <VipBadge isVip={profile.is_vip} isSvip={profile.is_svip} />
+            <VipBadge isVip={isVipActive(profile.vip_expiry)} isSvip={isSvipActive(profile.svip_expiry)} />
           </div>
           {profile.bio && (
             <p className="max-w-xs text-center text-sm text-muted-foreground">
@@ -193,14 +193,14 @@ export function ProfileView({
       </div>
 
       {/* VIP Section */}
-      {(profile.is_vip || profile.is_svip) && (
+      {(isVipActive(profile.vip_expiry) || isSvipActive(profile.svip_expiry)) && (
         <div className="mx-4 mb-6 flex items-center gap-3 rounded-2xl bg-card p-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full gradient-gold">
             <Crown className="h-6 w-6 text-background" />
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-gold">
-              {profile.is_svip ? "SVIP Member" : "VIP Member"}
+              {isSvipActive(profile.svip_expiry) ? "SVIP Member" : "VIP Member"}
             </span>
             {profile.vip_expiry && (
               <span className="text-xs text-muted-foreground">

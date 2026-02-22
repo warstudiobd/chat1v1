@@ -76,3 +76,14 @@ export const ROOM_CATEGORIES = [
 export function formatCategory(cat: string): string {
   return cat.charAt(0).toUpperCase() + cat.slice(1);
 }
+
+/** Derive VIP / SVIP active status from expiry timestamps */
+export function isVipActive(vipExpiry: string | null): boolean {
+  if (!vipExpiry) return false;
+  return new Date(vipExpiry) > new Date();
+}
+
+export function isSvipActive(svipExpiry: string | null): boolean {
+  if (!svipExpiry) return false;
+  return new Date(svipExpiry) > new Date();
+}

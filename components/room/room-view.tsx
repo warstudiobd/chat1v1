@@ -18,8 +18,8 @@ type RoomViewProps = {
       display_name: string | null;
       avatar_url: string | null;
       level: number;
-      is_vip: boolean;
-      is_svip: boolean;
+      vip_expiry: string | null;
+      svip_expiry: string | null;
     } | null;
   };
   initialSeats: {

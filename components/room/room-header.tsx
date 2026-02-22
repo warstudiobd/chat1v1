@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Eye, Share2, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, isVipActive, isSvipActive } from "@/lib/utils";
 import { UserAvatar } from "@/components/user-avatar";
 import { LevelBadge } from "@/components/level-badge";
 import { VipBadge } from "@/components/vip-badge";
@@ -16,8 +16,8 @@ type RoomHeaderProps = {
     display_name: string | null;
     avatar_url: string | null;
     level: number;
-    is_vip: boolean;
-    is_svip: boolean;
+    vip_expiry: string | null;
+    svip_expiry: string | null;
   } | null;
 };
 
@@ -59,7 +59,7 @@ export function RoomHeader({
                 {owner.display_name}
               </span>
               <LevelBadge level={owner.level} />
-              <VipBadge isVip={owner.is_vip} isSvip={owner.is_svip} />
+              <VipBadge isVip={isVipActive(owner.vip_expiry)} isSvip={isSvipActive(owner.svip_expiry)} />
             </div>
           )}
         </div>
