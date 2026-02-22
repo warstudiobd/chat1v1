@@ -1,34 +1,67 @@
 "use client";
 
-import { Bell, Mic } from "lucide-react";
+import Image from "next/image";
+import { Bell, Coins, Search } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/components/user-provider";
-import { DiamondDisplay } from "@/components/diamond-display";
+import { formatNumber } from "@/lib/utils";
 
 export function HomeHeader() {
   const { profile } = useUser();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-md">
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary md:hidden">
-          <Mic className="h-4 w-4 text-primary-foreground" />
-        </div>
-        <span className="text-lg font-bold text-foreground md:hidden">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between px-4 glass-dark">
+      <div className="flex items-center gap-2.5">
+        <Image
+          src="/icon-192.jpg"
+          alt="LotChat"
+          width={32}
+          height={32}
+          className="h-8 w-8 rounded-xl md:hidden"
+        />
+        <h1 className="text-lg font-bold text-foreground md:hidden">
           LotChat
-        </span>
+        </h1>
         <span className="hidden text-lg font-bold text-foreground md:block">
           Home
         </span>
       </div>
-      <div className="flex items-center gap-3">
-        {profile && <DiamondDisplay amount={profile.diamonds} />}
+      <div className="flex items-center gap-2">
+        {/* Coin balance */}
+        {profile && (
+          <Link
+            href="/shop"
+            className="flex items-center gap-1.5 rounded-full glass px-3 py-1.5"
+          >
+            <Coins className="h-3.5 w-3.5 text-gold" />
+            <span className="text-xs font-bold text-gold">
+              {formatNumber(profile.diamonds)}
+            </span>
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gold/20 text-[8px] font-black text-gold">
+              +
+            </span>
+          </Link>
+        )}
+
+        {/* Search */}
+        <Link
+          href="/discover"
+          className="flex h-9 w-9 items-center justify-center rounded-full glass text-muted-foreground hover:text-foreground"
+          aria-label="Search"
+        >
+          <Search className="h-4 w-4" />
+        </Link>
+
+        {/* Notifications */}
         <Link
           href="/notifications"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
+          className="relative flex h-9 w-9 items-center justify-center rounded-full glass text-muted-foreground hover:text-foreground"
           aria-label="Notifications"
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="h-4 w-4" />
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-pink text-[8px] font-bold text-primary-foreground">
+            3
+          </span>
         </Link>
       </div>
     </header>

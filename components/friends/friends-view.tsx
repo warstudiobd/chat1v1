@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/user-avatar";
 import { LevelBadge } from "@/components/level-badge";
 import {
-  ArrowLeft,
   Search,
   UserPlus,
   MessageCircle,
@@ -56,20 +55,13 @@ export function FriendsView({ friends, pendingRequests }: Props) {
   const onlineCount = friends.filter((f) => f.is_online).length;
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="p-4">
       <div className="mx-auto max-w-lg">
         {/* Header */}
-        <div className="mb-4 flex items-center gap-3">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-foreground">Friends</h2>
           <button
-            onClick={() => router.back()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-            aria-label="Back"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-xl font-bold text-foreground">Friends</h1>
-          <button
-            className="ml-auto flex h-10 w-10 items-center justify-center rounded-full gradient-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full gradient-primary"
             aria-label="Add friend"
           >
             <UserPlus className="h-5 w-5 text-primary-foreground" />

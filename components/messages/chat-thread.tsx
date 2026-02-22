@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Send, Gift } from "lucide-react";
-import { cn, timeAgo } from "@/lib/utils";
+import { cn, timeAgo, isVipActive, isSvipActive } from "@/lib/utils";
 import { UserAvatar } from "@/components/user-avatar";
 import { LevelBadge } from "@/components/level-badge";
 import { VipBadge } from "@/components/vip-badge";
@@ -24,8 +24,8 @@ type OtherUser = {
   display_name: string | null;
   avatar_url: string | null;
   level: number;
-  is_vip: boolean;
-  is_svip: boolean;
+  vip_expiry: string | null;
+  svip_expiry: string | null;
 };
 
 export function ChatThread({
@@ -107,7 +107,7 @@ export function ChatThread({
               {otherUser.display_name || "User"}
             </span>
             <LevelBadge level={otherUser.level} />
-            <VipBadge isVip={otherUser.is_vip} isSvip={otherUser.is_svip} />
+            <VipBadge isVip={isVipActive(otherUser.vip_expiry)} isSvip={isSvipActive(otherUser.svip_expiry)} />
           </div>
         </div>
       </header>

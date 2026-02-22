@@ -1,82 +1,148 @@
 "use client";
 
-import { useState } from "react";
-import { X, Diamond, Send } from "lucide-react";
-import { cn, GIFT_LIST } from "@/lib/utils";
+import { useState, useRef } from "react";
+import { X, Coins, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { GIFTS, GIFT_CATEGORIES, formatCoinPrice, type Gift, type GiftCategory } from "@/lib/gifts";
+import { useUser } from "@/components/user-provider";
+import { createClient } from "@/lib/supabase/client";
 
-const giftIcons: Record<string, string> = {
-  rose: "/gifts/rose.svg",
-  beer: "/gifts/beer.svg",
-  cake: "/gifts/cake.svg",
-  heart: "/gifts/heart.svg",
-  fireworks: "/gifts/fireworks.svg",
-  car: "/gifts/car.svg",
-  yacht: "/gifts/yacht.svg",
-  castle: "/gifts/castle.svg",
-  rocket: "/gifts/rocket.svg",
-  planet: "/gifts/planet.svg",
-};
-
-export function GiftPanel({
-  roomId,
-  onClose,
-}: {
+type GiftPanelProps = {
   roomId: string;
   onClose: () => void;
-}) {
+  onGiftSent?: (gift: Gift, quantity: number) => void;
+};
+
+export function GiftPanel({ roomId, onClose, onGiftSent }: GiftPanelProps) {
+  const { profile } = useUser();
+  const [activeCategory, setActiveCategory] = useState<GiftCategory>("love");
   const [selected, setSelected] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [sending, setSending] = useState(false);
+  const catScrollRef = useRef<HTMLDivElement>(null);
 
-  const selectedGift = GIFT_LIST.find((g) => g.id === selected);
+  const filteredGifts = GIFTS.filter((g) => g.category === activeCategory);
+  const selectedGift = GIFTS.find((g) => g.id === selected);
+  const totalCost = selectedGift ? selectedGift.cost * quantity : 0;
+  const canAfford = (profile?.diamonds ?? 0) >= totalCost;
+
+  async function handleSend() {
+    if (!selected || !selectedGift || !profile || sending) return;
+    setSending(true);
+
+    const supabase = createClient();
+
+    // Deduct diamonds
+    await supabase
+      .from("profiles")
+      .update({ diamonds: Math.max(0, (profile.diamonds ?? 0) - totalCost) })
+      .eq("id", profile.id);
+
+    // Record gift in messages
+    await supabase.from("messages").insert({
+      sender_id: profile.id,
+      receiver_id: roomId,
+      content: `sent ${selectedGift.name}`,
+      msg_type: "gift",
+      gift_type: selectedGift.id,
+      diamond_cost: totalCost,
+    });
+
+    // Trigger animation
+    onGiftSent?.(selectedGift, quantity);
+    setSending(false);
+    setSelected(null);
+  }
+
+  function scrollCats(dir: "left" | "right") {
+    catScrollRef.current?.scrollBy({ left: dir === "left" ? -120 : 120, behavior: "smooth" });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
-      <div className="absolute inset-0 bg-background/60" onClick={onClose} />
-      <div className="relative w-full max-w-lg animate-slide-up rounded-t-3xl border-t border-border bg-card">
+      <div className="absolute inset-0 bg-background/50" onClick={onClose} />
+
+      <div className="relative w-full max-w-lg animate-slide-up rounded-t-3xl border-t border-border/50 bg-card">
+        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
-          <h3 className="text-sm font-bold text-foreground">Send Gift</h3>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-foreground">Gifts</span>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+              {GIFTS.length}{" items"}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-1">
+              <Coins className="h-3.5 w-3.5 text-gold" />
+              <span className="text-xs font-bold text-gold">
+                {(profile?.diamonds ?? 0).toLocaleString()}
+              </span>
+            </div>
+            <button onClick={onClose} className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground" aria-label="Close">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Category tabs */}
+        <div className="relative flex items-center px-1">
+          <button onClick={() => scrollCats("left")} className="shrink-0 p-1 text-muted-foreground" aria-label="Scroll left">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div ref={catScrollRef} className="flex gap-1 overflow-x-auto scrollbar-hide px-1 py-1.5">
+            {GIFT_CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => { setActiveCategory(cat.id); setSelected(null); }}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+                  activeCategory === cat.id
+                    ? "gradient-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => scrollCats("right")} className="shrink-0 p-1 text-muted-foreground" aria-label="Scroll right">
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-5 gap-2 px-4 pb-2">
-          {GIFT_LIST.map((gift) => (
+        {/* Gift grid */}
+        <div className="grid grid-cols-4 gap-1.5 px-3 py-3 max-h-64 overflow-y-auto scrollbar-hide">
+          {filteredGifts.map((gift) => (
             <button
               key={gift.id}
               onClick={() => setSelected(gift.id)}
               className={cn(
-                "flex flex-col items-center gap-1 rounded-xl p-2 transition-colors",
+                "flex flex-col items-center gap-0.5 rounded-xl p-2 transition-all",
                 selected === gift.id
-                  ? "bg-primary/20 ring-1 ring-primary"
-                  : "bg-muted/50 hover:bg-muted"
+                  ? "bg-primary/20 ring-1 ring-primary scale-105"
+                  : "bg-muted/30 hover:bg-muted/60"
               )}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-lg font-bold text-foreground">
-                {gift.name.charAt(0)}
-              </div>
-              <span className="text-[10px] text-foreground">{gift.name}</span>
-              <span className="flex items-center gap-0.5 text-[10px] text-gold">
-                <Diamond className="h-2.5 w-2.5" />
-                {gift.cost}
+              <span className="text-3xl">{gift.emoji}</span>
+              <span className="text-[9px] leading-tight text-foreground/80 line-clamp-1">{gift.name}</span>
+              <span className="flex items-center gap-0.5 text-[9px] font-bold text-gold">
+                <Coins className="h-2 w-2" />
+                {formatCoinPrice(gift.cost)}
               </span>
             </button>
           ))}
         </div>
 
-        <div className="flex items-center justify-between border-t border-border px-4 py-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Qty:</span>
-            {[1, 10, 99].map((q) => (
+        {/* Footer: quantity + send */}
+        <div className="flex items-center justify-between border-t border-border/50 px-4 py-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-muted-foreground">Qty</span>
+            {[1, 5, 10, 66, 99, 520].map((q) => (
               <button
                 key={q}
                 onClick={() => setQuantity(q)}
                 className={cn(
-                  "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                  "rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors",
                   quantity === q
                     ? "gradient-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground"
@@ -88,15 +154,16 @@ export function GiftPanel({
           </div>
 
           <button
-            disabled={!selected}
-            className="flex items-center gap-2 rounded-full gradient-primary px-5 py-2 text-xs font-semibold text-primary-foreground transition-opacity disabled:opacity-40"
+            onClick={handleSend}
+            disabled={!selected || !canAfford || sending}
+            className="flex items-center gap-1.5 rounded-full gradient-primary px-4 py-2 text-xs font-bold text-primary-foreground transition-opacity disabled:opacity-30"
           >
             <Send className="h-3.5 w-3.5" />
             Send
             {selectedGift && (
-              <span className="flex items-center gap-0.5 opacity-80">
-                <Diamond className="h-3 w-3" />
-                {selectedGift.cost * quantity}
+              <span className="flex items-center gap-0.5 rounded-full bg-white/20 px-1.5 py-0.5">
+                <Coins className="h-2.5 w-2.5" />
+                {formatCoinPrice(totalCost)}
               </span>
             )}
           </button>

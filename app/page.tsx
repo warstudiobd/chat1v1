@@ -1,50 +1,89 @@
 import Link from "next/link";
-import { Mic, Users, Gift, MessageCircle } from "lucide-react";
+import Image from "next/image";
+import { Mic, Users, Gift, Gamepad2, Video, Shield } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/home");
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="flex max-w-md flex-col items-center gap-8 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl gradient-primary">
-          <Mic className="h-10 w-10 text-primary-foreground" />
+    <main className="flex min-h-dvh flex-col gradient-chamet">
+      {/* Hero */}
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-12">
+        {/* App Icon */}
+        <div className="relative">
+          <div className="absolute -inset-4 animate-pulse-ring rounded-3xl gradient-primary opacity-30" />
+          <Image
+            src="/icon-512.jpg"
+            alt="LotChat"
+            width={96}
+            height={96}
+            className="relative h-24 w-24 rounded-3xl shadow-2xl"
+            priority
+          />
         </div>
-        <div className="flex flex-col gap-3">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground text-balance">
-            Welcome to LotChat
+
+        {/* Title */}
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground text-balance">
+            LotChat
           </h1>
-          <p className="text-lg text-muted-foreground text-pretty leading-relaxed">
-            Join voice rooms, meet new people, send gifts, and build your
-            community.
+          <p className="text-base text-muted-foreground leading-relaxed text-pretty">
+            Voice & Video Room
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground/70">
+            by WarStudio Ltd
           </p>
         </div>
-        <div className="grid w-full grid-cols-3 gap-4">
-          <div className="flex flex-col items-center gap-2 rounded-xl bg-card p-4">
-            <Users className="h-6 w-6 text-primary" />
-            <span className="text-xs text-muted-foreground">Voice Rooms</span>
-          </div>
-          <div className="flex flex-col items-center gap-2 rounded-xl bg-card p-4">
-            <Gift className="h-6 w-6 text-pink" />
-            <span className="text-xs text-muted-foreground">Send Gifts</span>
-          </div>
-          <div className="flex flex-col items-center gap-2 rounded-xl bg-card p-4">
-            <MessageCircle className="h-6 w-6 text-gold" />
-            <span className="text-xs text-muted-foreground">Chat</span>
-          </div>
+
+        {/* Features Grid */}
+        <div className="grid w-full max-w-xs grid-cols-3 gap-3">
+          {[
+            { icon: Mic, label: "Voice Rooms", color: "text-primary" },
+            { icon: Video, label: "Video Chat", color: "text-cyan" },
+            { icon: Gift, label: "Send Gifts", color: "text-pink" },
+            { icon: Gamepad2, label: "Games", color: "text-gold" },
+            { icon: Users, label: "Community", color: "text-primary" },
+            { icon: Shield, label: "Secure", color: "text-cyan" },
+          ].map((f, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-2 rounded-2xl glass p-4"
+            >
+              <f.icon className={`h-6 w-6 ${f.color}`} />
+              <span className="text-[10px] font-medium text-muted-foreground">
+                {f.label}
+              </span>
+            </div>
+          ))}
         </div>
-        <div className="flex w-full flex-col gap-3">
-          <Link
-            href="/auth/login"
-            className="flex h-12 w-full items-center justify-center rounded-xl gradient-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Log In
-          </Link>
-          <Link
-            href="/auth/sign-up"
-            className="flex h-12 w-full items-center justify-center rounded-xl border border-border bg-card text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          >
-            Create Account
-          </Link>
-        </div>
+      </div>
+
+      {/* Bottom Actions */}
+      <div className="flex flex-col gap-3 px-6 pb-10 pt-4">
+        <Link
+          href="/auth/login"
+          className="flex h-14 w-full items-center justify-center rounded-2xl gradient-primary text-base font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-opacity active:opacity-90"
+        >
+          Log In
+        </Link>
+        <Link
+          href="/auth/sign-up"
+          className="flex h-14 w-full items-center justify-center rounded-2xl glass border border-border text-base font-bold text-foreground transition-colors active:bg-muted"
+        >
+          Create Account
+        </Link>
+        <p className="mt-2 text-center text-[11px] text-muted-foreground/60 leading-relaxed">
+          By continuing, you agree to our Terms of Service and Privacy Policy
+        </p>
       </div>
     </main>
   );
