@@ -3,13 +3,13 @@
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const SEAT_MODES = [5, 8, 10, 20] as const;
+const SEAT_MODES = [2, 9, 11, 21] as const;
 
 const modeDescriptions: Record<number, string> = {
-  5: "Small & cozy - 3 column layout",
-  8: "Standard - 4 column layout",
-  10: "Large - 5 column layout",
-  20: "Party mode - 5 column layout",
+  2: "Duo - 1v1 conversation",
+  9: "Standard - 4 column layout",
+  11: "Large - 5 column layout",
+  21: "Party mode - 5 column layout",
 };
 
 export function SeatModeSwitcher({
