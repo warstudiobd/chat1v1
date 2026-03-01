@@ -11,12 +11,14 @@ import {
   Volume2,
   LayoutGrid,
   Settings2,
+  Music2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GiftPanel } from "@/components/room/gift-panel";
 import { EmojiPicker } from "@/components/room/emoji-picker";
 import { RoomGames } from "@/components/room/room-games";
 import { SeatModeSwitcher } from "@/components/room/seat-mode-switcher";
+import { SoundVibes } from "@/components/room/sound-vibes";
 import type { Gift as GiftType } from "@/lib/gifts";
 
 type RoomToolbarProps = {
@@ -25,6 +27,10 @@ type RoomToolbarProps = {
   onSeatModeChange: (mode: number) => void;
   onSendMessage: (msg: string) => void;
   onGiftSent?: (gift: GiftType, quantity: number) => void;
+  onEmojiFloat?: (emoji: string) => void;
+  isPrivileged?: boolean;
+  activeVibe: string | null;
+  onVibeChange: (vibeId: string | null) => void;
 };
 
 export function RoomActions({
@@ -33,6 +39,10 @@ export function RoomActions({
   onSeatModeChange,
   onSendMessage,
   onGiftSent,
+  onEmojiFloat,
+  isPrivileged,
+  activeVibe,
+  onVibeChange,
 }: RoomToolbarProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [isSpeakerOff, setIsSpeakerOff] = useState(false);
@@ -41,6 +51,7 @@ export function RoomActions({
   const [showGames, setShowGames] = useState(false);
   const [showSeatMode, setShowSeatMode] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showVibes, setShowVibes] = useState(false);
   const [chatMsg, setChatMsg] = useState("");
 
   function handleSendChat() {
@@ -54,6 +65,11 @@ export function RoomActions({
   function handleGiftSent(gift: GiftType, quantity: number) {
     onGiftSent?.(gift, quantity);
     setShowGifts(false);
+  }
+
+  function handleEmojiSelect(emoji: string) {
+    onSendMessage(emoji);
+    onEmojiFloat?.(emoji);
   }
 
   return (
@@ -125,14 +141,30 @@ export function RoomActions({
           <Gift className="h-6 w-6 text-primary-foreground" />
         </button>
 
-        {/* Seat mode */}
-        <button
-          onClick={() => setShowSeatMode(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
-          aria-label="Seat mode"
-        >
-          <Settings2 className="h-5 w-5" />
-        </button>
+        {/* Sound Vibes (owner/admin only) */}
+        {isPrivileged ? (
+          <button
+            onClick={() => setShowVibes(true)}
+            className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-full",
+              activeVibe ? "bg-primary/20 text-primary" : "bg-white/8 text-muted-foreground hover:text-foreground"
+            )}
+            aria-label="Sound Vibes"
+          >
+            <Music2 className="h-5 w-5" />
+            {activeVibe && (
+              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={() => setShowSeatMode(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
+            aria-label="Seat mode"
+          >
+            <Settings2 className="h-5 w-5" />
+          </button>
+        )}
 
         {/* Volume */}
         <button
@@ -155,6 +187,17 @@ export function RoomActions({
           <LayoutGrid className="h-5 w-5" />
           <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-pink" />
         </button>
+
+        {/* Seat mode (for privileged, add as extra) */}
+        {isPrivileged && (
+          <button
+            onClick={() => setShowSeatMode(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-muted-foreground hover:text-foreground"
+            aria-label="Seat mode"
+          >
+            <Settings2 className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
       {/* Panels */}
@@ -163,13 +206,20 @@ export function RoomActions({
       )}
       {showEmoji && (
         <EmojiPicker
-          onSelect={(emoji) => onSendMessage(emoji)}
+          onSelect={handleEmojiSelect}
           onClose={() => setShowEmoji(false)}
         />
       )}
       {showGames && <RoomGames onClose={() => setShowGames(false)} />}
       {showSeatMode && (
         <SeatModeSwitcher currentMode={seatMode} onSelect={onSeatModeChange} onClose={() => setShowSeatMode(false)} />
+      )}
+      {showVibes && (
+        <SoundVibes
+          onClose={() => setShowVibes(false)}
+          activeVibe={activeVibe}
+          onVibeChange={onVibeChange}
+        />
       )}
     </>
   );

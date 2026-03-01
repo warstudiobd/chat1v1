@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { getGiftSvg } from "@/components/room/gift-svgs";
 import type { Gift } from "@/lib/gifts";
 
 type GiftAnimationProps = {
@@ -10,10 +11,11 @@ type GiftAnimationProps = {
   onComplete: () => void;
 };
 
-function Particle({ emoji, delay, x, y }: { emoji: string; delay: number; x: number; y: number }) {
+function SvgParticle({ giftId, delay, x, y }: { giftId: string; delay: number; x: number; y: number }) {
+  const SvgComp = getGiftSvg(giftId);
   return (
     <span
-      className="absolute text-2xl pointer-events-none"
+      className="absolute pointer-events-none"
       style={{
         left: `${x}%`,
         top: `${y}%`,
@@ -21,13 +23,14 @@ function Particle({ emoji, delay, x, y }: { emoji: string; delay: number; x: num
         opacity: 0,
       }}
     >
-      {emoji}
+      {SvgComp ? <SvgComp size={28} /> : <span className="text-2xl">{giftId}</span>}
     </span>
   );
 }
 
 export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAnimationProps) {
   const [phase, setPhase] = useState<"enter" | "main" | "exit">("enter");
+  const SvgComp = getGiftSvg(gift.id);
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("main"), 400);
@@ -36,8 +39,13 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [onComplete]);
 
+  const renderMainSvg = useCallback((size: number, className?: string) => {
+    if (SvgComp) return <SvgComp size={size} />;
+    return <span className={className}>{gift.emoji}</span>;
+  }, [SvgComp, gift.emoji]);
+
   const renderAnimation = useCallback(() => {
-    const { animation, emoji } = gift;
+    const { animation } = gift;
 
     switch (animation) {
       case "fly":
@@ -46,14 +54,14 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
             {Array.from({ length: Math.min(quantity, 10) }).map((_, i) => (
               <span
                 key={i}
-                className="absolute text-5xl"
+                className="absolute"
                 style={{
                   animation: `gift-fly 2.5s ${i * 0.15}s ease-out forwards`,
                   left: `${30 + Math.random() * 40}%`,
                   bottom: "20%",
                 }}
               >
-                {emoji}
+                {renderMainSvg(48)}
               </span>
             ))}
           </div>
@@ -62,13 +70,13 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
       case "burst":
         return (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-7xl animate-[gift-burst_0.6s_ease-out] animate-[gift-glow_2s_ease-in-out_infinite]">
-              {emoji}
+            <span className="animate-[gift-burst_0.6s_ease-out]">
+              {renderMainSvg(80)}
             </span>
             {Array.from({ length: 8 }).map((_, i) => (
-              <Particle
+              <SvgParticle
                 key={i}
-                emoji={emoji}
+                giftId={gift.id}
                 delay={i * 0.1}
                 x={50 + Math.cos((i * Math.PI) / 4) * 25}
                 y={50 + Math.sin((i * Math.PI) / 4) * 25}
@@ -83,7 +91,7 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
             {Array.from({ length: 20 }).map((_, i) => (
               <span
                 key={i}
-                className="absolute text-3xl"
+                className="absolute"
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: "-10%",
@@ -91,7 +99,7 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
                   transform: "rotate(180deg)",
                 }}
               >
-                {emoji}
+                {renderMainSvg(32)}
               </span>
             ))}
           </div>
@@ -100,8 +108,8 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
       case "spin":
         return (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-7xl animate-[spin_2s_linear_infinite] animate-[gift-glow_2s_ease-in-out_infinite]">
-              {emoji}
+            <span className="animate-[spin_2s_linear_infinite]">
+              {renderMainSvg(80)}
             </span>
           </div>
         );
@@ -109,8 +117,8 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
       case "shake":
         return (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-7xl animate-[shake_0.5s_ease-in-out_infinite]">
-              {emoji}
+            <span className="animate-[shake_0.5s_ease-in-out_infinite]">
+              {renderMainSvg(80)}
             </span>
           </div>
         );
@@ -121,14 +129,14 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
             {Array.from({ length: 12 }).map((_, i) => (
               <span
                 key={i}
-                className="absolute text-3xl"
+                className="absolute"
                 style={{
                   left: `${20 + Math.random() * 60}%`,
                   bottom: "10%",
                   animation: `heart-float 3s ${i * 0.2}s ease-out forwards`,
                 }}
               >
-                {emoji}
+                {renderMainSvg(36)}
               </span>
             ))}
           </div>
@@ -144,19 +152,19 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
                 return (
                   <span
                     key={i}
-                    className="absolute text-3xl"
+                    className="absolute"
                     style={{
                       animation: `gift-burst 0.8s ${i * 0.05}s ease-out forwards`,
                       transform: `translate(${Math.cos(angle) * r}px, ${Math.sin(angle) * r}px)`,
                     }}
                   >
-                    {emoji}
+                    {renderMainSvg(32)}
                   </span>
                 );
               })}
             </div>
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl animate-[gift-burst_0.6s_ease-out]">
-              {emoji}
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-[gift-burst_0.6s_ease-out]">
+              {renderMainSvg(64)}
             </span>
           </div>
         );
@@ -166,23 +174,25 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {/* Central glow */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-48 w-48 rounded-full bg-primary/20 blur-3xl animate-pulse" />
-            {/* Main emoji */}
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-8xl animate-[gift-burst_0.8s_ease-out] animate-[gift-glow_2s_ease-in-out_infinite]">
-              {emoji}
+            {/* Main SVG */}
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-[gift-burst_0.8s_ease-out]">
+              {renderMainSvg(96)}
             </span>
-            {/* Surrounding particles */}
+            {/* Surrounding sparkle particles */}
             {Array.from({ length: 16 }).map((_, i) => {
               const angle = (i * 22.5 * Math.PI) / 180;
               return (
                 <span
                   key={i}
-                  className="absolute left-1/2 top-1/2 text-2xl"
+                  className="absolute left-1/2 top-1/2"
                   style={{
                     animation: `sparkle 1.5s ${i * 0.08}s ease-out infinite`,
                     transform: `translate(${Math.cos(angle) * 100}px, ${Math.sin(angle) * 100}px)`,
                   }}
                 >
-                  {["✨", "🌟", "💫", "⭐"][i % 4]}
+                  <svg width="12" height="12" viewBox="0 0 12 12">
+                    <polygon points="6,0 7.5,4.5 12,6 7.5,7.5 6,12 4.5,7.5 0,6 4.5,4.5" fill={["hsl(45 100% 55%)", "hsl(330 80% 55%)", "hsl(200 80% 55%)", "hsl(120 60% 50%)"][i % 4]} />
+                  </svg>
                 </span>
               );
             })}
@@ -192,11 +202,11 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
       default:
         return (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-7xl animate-[gift-burst_0.6s_ease-out]">{emoji}</span>
+            <span className="animate-[gift-burst_0.6s_ease-out]">{renderMainSvg(80)}</span>
           </div>
         );
     }
-  }, [gift, quantity]);
+  }, [gift, quantity, renderMainSvg]);
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none">
@@ -220,7 +230,7 @@ export function GiftAnimation({ gift, senderName, quantity, onComplete }: GiftAn
         }}
       >
         <div className="flex items-center gap-3 rounded-2xl glass-dark px-5 py-3">
-          <span className="text-3xl">{gift.emoji}</span>
+          <span>{renderMainSvg(36)}</span>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-foreground">
               {senderName}
