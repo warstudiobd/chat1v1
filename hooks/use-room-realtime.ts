@@ -14,17 +14,21 @@ type RealtimeMessage = {
     id: string;
     display_name: string | null;
     avatar_url: string | null;
+    vip_level?: "none" | "vip" | "svip";
   } | null;
 };
 
 type RealtimeSeat = {
   seatNumber: number;
   isMuted: boolean;
+  isLocked?: boolean;
+  invitedUserId?: string | null;
   user: {
     id: string;
     display_name: string | null;
     avatar_url: string | null;
     level: number;
+    vip_level?: "none" | "vip" | "svip";
   } | null;
 };
 
@@ -42,7 +46,7 @@ export function useRoomRealtime(
     const { data } = await supabase
       .from("room_seats")
       .select(
-        `seat_number, is_muted, user:profiles!room_seats_user_id_fkey (id, display_name, avatar_url, level)`
+        `seat_number, is_muted, is_locked, invited_user_id, user:profiles!room_seats_user_id_fkey (id, display_name, avatar_url, level, vip_level)`
       )
       .eq("room_id", roomId)
       .order("seat_number");
@@ -52,6 +56,8 @@ export function useRoomRealtime(
         data.map((s: any) => ({
           seatNumber: s.seat_number,
           isMuted: s.is_muted,
+          isLocked: s.is_locked ?? false,
+          invitedUserId: s.invited_user_id,
           user: s.user,
         }))
       );
@@ -90,7 +96,7 @@ export function useRoomRealtime(
         async (payload) => {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("id, display_name, avatar_url")
+            .select("id, display_name, avatar_url, vip_level")
             .eq("id", payload.new.sender_id)
             .single();
 

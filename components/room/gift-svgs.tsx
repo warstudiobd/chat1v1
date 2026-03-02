@@ -364,3 +364,20 @@ const GIFT_SVG_MAP: Record<string, React.FC<{ size?: number }>> = {
 export function getGiftSvg(giftId: string): React.FC<{ size?: number }> | null {
   return GIFT_SVG_MAP[giftId] || null;
 }
+
+// Generic icon component for gift panel thumbnails
+export function GiftSvgIcon({ giftId, size = 40 }: { giftId: string; size?: number }) {
+  const SvgComp = GIFT_SVG_MAP[giftId];
+  if (SvgComp) return <SvgComp size={size} />;
+  // Fallback: render a generic gift box SVG
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <rect x="10" y="28" width="44" height="28" rx="4" fill="hsl(330 70% 55%)" />
+      <rect x="28" y="28" width="8" height="28" fill="hsl(45 100% 55%)" />
+      <rect x="6" y="20" width="52" height="12" rx="3" fill="hsl(350 70% 60%)" />
+      <rect x="28" y="20" width="8" height="12" fill="hsl(45 100% 60%)" />
+      <path d="M32 20 C24 8 12 14 20 20" stroke="hsl(45 100% 55%)" strokeWidth="2" fill="none" />
+      <path d="M32 20 C40 8 52 14 44 20" stroke="hsl(45 100% 55%)" strokeWidth="2" fill="none" />
+    </svg>
+  );
+}
