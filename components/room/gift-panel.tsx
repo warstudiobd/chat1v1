@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { X, Coins, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GIFTS, GIFT_CATEGORIES, formatCoinPrice, type Gift, type GiftCategory } from "@/lib/gifts";
+import { GiftSvgIcon } from "@/components/room/gift-svgs";
 import { useUser } from "@/components/user-provider";
 import { createClient } from "@/lib/supabase/client";
 
@@ -123,7 +124,7 @@ export function GiftPanel({ roomId, onClose, onGiftSent }: GiftPanelProps) {
                   : "bg-muted/30 hover:bg-muted/60"
               )}
             >
-              <span className="text-3xl">{gift.emoji}</span>
+              <GiftSvgIcon giftId={gift.id} size={40} />
               <span className="text-[9px] leading-tight text-foreground/80 line-clamp-1">{gift.name}</span>
               <span className="flex items-center gap-0.5 text-[9px] font-bold text-gold">
                 <Coins className="h-2 w-2" />

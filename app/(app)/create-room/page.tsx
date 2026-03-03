@@ -7,7 +7,7 @@ import { cn, ROOM_CATEGORIES, formatCategory } from "@/lib/utils";
 import { useUser } from "@/components/user-provider";
 import { createClient } from "@/lib/supabase/client";
 
-const seatOptions = [5, 8, 10, 20] as const;
+const seatOptions = [2, 9, 11, 21] as const;
 
 export default function CreateRoomPage() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function CreateRoomPage() {
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("chat");
-  const [maxSeats, setMaxSeats] = useState<number>(8);
+  const [maxSeats, setMaxSeats] = useState<number>(9);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

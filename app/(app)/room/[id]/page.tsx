@@ -16,7 +16,7 @@ export default async function VoiceRoomPage({
       `
       *,
       owner:profiles!voice_rooms_owner_id_fkey (
-        id, display_name, avatar_url, level
+        id, display_name, avatar_url, level, vip_level
       )
     `
     )
@@ -31,8 +31,10 @@ export default async function VoiceRoomPage({
       `
       seat_number,
       is_muted,
+      is_locked,
+      invited_user_id,
       user:profiles!room_seats_user_id_fkey (
-        id, display_name, avatar_url, level
+        id, display_name, avatar_url, level, vip_level
       )
     `
     )
@@ -50,13 +52,18 @@ export default async function VoiceRoomPage({
       diamond_cost,
       created_at,
       sender:profiles!messages_sender_id_fkey (
-        id, display_name, avatar_url
+        id, display_name, avatar_url, vip_level
       )
     `
     )
     .eq("receiver_id", id)
     .order("created_at", { ascending: true })
     .limit(50);
+
+  const { data: admins } = await supabase
+    .from("room_admins")
+    .select("user_id")
+    .eq("room_id", id);
 
   return (
     <RoomView
@@ -72,6 +79,8 @@ export default async function VoiceRoomPage({
       initialSeats={(seats || []).map((s: any) => ({
         seatNumber: s.seat_number,
         isMuted: s.is_muted,
+        isLocked: s.is_locked ?? false,
+        invitedUserId: s.invited_user_id,
         user: s.user,
       }))}
       initialMessages={(messages || []).map((m: any) => ({
@@ -83,6 +92,7 @@ export default async function VoiceRoomPage({
         createdAt: m.created_at,
         sender: m.sender,
       }))}
+      initialAdminIds={(admins || []).map((a: any) => a.user_id)}
     />
   );
 }

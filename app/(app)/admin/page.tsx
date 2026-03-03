@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
+import { AdminLoginGate } from "@/components/admin/admin-login-gate";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -31,13 +32,15 @@ export default async function AdminPage() {
     .limit(10);
 
   return (
-    <AdminDashboard
-      stats={{
-        totalUsers: totalUsers || 0,
-        activeRooms: activeRooms || 0,
-      }}
-      recentUsers={(recentUsers || []) as any}
-      recentRooms={(recentRooms || []) as any}
-    />
+    <AdminLoginGate>
+      <AdminDashboard
+        stats={{
+          totalUsers: totalUsers || 0,
+          activeRooms: activeRooms || 0,
+        }}
+        recentUsers={(recentUsers || []) as any}
+        recentRooms={(recentRooms || []) as any}
+      />
+    </AdminLoginGate>
   );
 }
